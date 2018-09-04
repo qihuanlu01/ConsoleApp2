@@ -45,6 +45,7 @@ namespace ConsoleApp2
                     else if (IsValidTimeFormat(line, Format))
                     {
                         timeStamp.First = line;
+
                         timeStamp.ChangeStingFormat(ref timeStamp.First);
                         
                     }
