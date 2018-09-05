@@ -11,23 +11,24 @@ namespace ConsoleApp2
     class MyApp
     {
 
-        const string Format = @"^\d\d[:]?\d\d[:]?\d\d$";
+        const string Format = @"^\d\d[:]?\d\d[:]?\d\d[-->]{3}$";
         const string Format2 = @"^\d\d[:]?\d\d[:]?\d\d-->\d\d[:]?\d\d[:]?\d\d$";
         const string Format3 = @"^\d\d[:]?\d\d[:]?\d\d[.]\d{3}-->\d\d[:]?\d\d[:]?\d\d[.]\d{3}$";
         const string Format4 = @"^\D.+";
         //const string Format5 = @"^[0-9]*$";
-
         const string path = @"C:\Users\Administrator\source\repos\ConsoleApp2\ConsoleApp2\ad.srt";
+        const string wrpath = @"C:\Users\Administrator\Source\Repos\Subtitle_Edit\ConsoleApp2\after.srt";
 
+       
 
         TimeStamp timeStamp = new TimeStamp();
 
         bool invalid = false;
         public int counter { get; set; } = 0;
-      // public string Line { get; set; }
 
         public void run()
         {
+            string lineTemp = "";
             TimeStamp timeStamp = new TimeStamp();
             string Subtitle = "";
             string text = "";
@@ -35,26 +36,31 @@ namespace ConsoleApp2
             try
             {
                 StreamReader sr = new StreamReader(path);
+                StreamWriter wr = new StreamWriter(wrpath);
 
                 while ((line = sr.ReadLine()) != null)
                 {
 
-                   // Console.WriteLine(line);
+                    // Console.WriteLine(line);
                     //Console.ReadKey();
 
-                    if (line == Environment.NewLine)
+                    if (line =="")
                     {
                         continue;
                     }
                     else if (IsValidTimeFormat(line, Format))
                     {
-                        timeStamp.First = line;
 
+                        line = Regex.Replace(line, @"[-][-][>]", string.Empty);
+                        timeStamp.First = line;
                         timeStamp.ChangeStingFormat(ref timeStamp.First);
 
-                        Console.WriteLine(line);
+                        timeStamp.Last = timeStamp.First;
 
-                        Console.ReadKey();
+                        timeStamp.First = lineTemp;
+                        lineTemp = timeStamp.Last;
+
+                        text = timeStamp.TimeSpanSplict();
 
                     }
                     else if (IsValidTimeFormat(line, Format2))
@@ -73,8 +79,7 @@ namespace ConsoleApp2
                         timeStamp.Last = vs[1];
                         timeStamp.ChangeStingFormat(ref timeStamp.Last);
                         text = timeStamp.TimeSpanSplict();
-                        Console.WriteLine(text);
-                        Console.ReadKey();
+                        // Console.WriteLine(text);
 
                     }
                     else if (IsValidTimeFormat(line, Format3))
@@ -82,17 +87,32 @@ namespace ConsoleApp2
                         continue;
                     }
 
+                    else if (IsValidTimeFormat(line, @"\d{1,3}"))
+                    {
+                        continue;
+                    }
                     else if (IsValidTimeFormat(line, Format4))
                     {
                         Subtitle = line;
-                        Console.WriteLine(Subtitle);
-                        Console.ReadKey();
+                       // Console.WriteLine(Subtitle);
+                        text = Subtitle;
                     }
 
-                    text = text + line;
+                    //
+                    if (IsValidTimeFormat(text, Format3))
+                    {
+                        wr.WriteLine(TimeStamp.ID);
+                        TimeStamp.ID++;
+                    }
+                    Console.WriteLine(text);
+                    wr.WriteLine(text);
+                    text = "";
+              //  Console.ReadKey();
                 }
 
+                wr.Close();
                 sr.Close();
+                TimeStamp.ID = 1;
             }
             catch (Exception e)
             {

@@ -3,7 +3,7 @@
     class TimeStamp
     {
         public string First = "00:00:00.000";
-        public string Last = "00:00:00.000";
+        public string Last = "0";
 
 
 
